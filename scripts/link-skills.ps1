@@ -99,6 +99,30 @@ function Get-NormalizedLinkTarget {
     return ConvertTo-NormalizedPath -Path ([string] $targets[0]) -BasePath (Split-Path -Parent $Item.FullName)
 }
 
+function Remove-DirectoryLink {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $LiteralPath
+    )
+
+    $item = Get-PathItem -LiteralPath $LiteralPath
+    if ($null -eq $item) {
+        return $false
+    }
+
+    if (-not (Test-IsDirectoryLink -Item $item)) {
+        throw "Refusing to remove a non-link directory: $LiteralPath"
+    }
+
+    [System.IO.Directory]::Delete($item.FullName, $false)
+
+    if ($null -ne (Get-PathItem -LiteralPath $LiteralPath)) {
+        throw "Directory link still exists after deletion: $LiteralPath"
+    }
+
+    return $true
+}
+
 function Get-SkillName {
     param(
         [Parameter(Mandatory = $true)]
@@ -260,8 +284,10 @@ foreach ($entry in $previousLinks) {
     }
 
     if ($PSCmdlet.ShouldProcess($oldLinkPath, 'Remove stale managed skill link')) {
-        Remove-Item -LiteralPath $oldLinkPath -Force
-        Write-Host "Removed stale link: $oldLinkPath"
+        $removed = Remove-DirectoryLink -LiteralPath $oldLinkPath
+        if ($removed) {
+            Write-Host "Removed stale link: $oldLinkPath"
+        }
     }
 }
 
@@ -275,7 +301,7 @@ foreach ($skill in $skills) {
         }
 
         if ($PSCmdlet.ShouldProcess($skill.LinkPath, 'Replace outdated managed skill link')) {
-            Remove-Item -LiteralPath $skill.LinkPath -Force
+            $null = Remove-DirectoryLink -LiteralPath $skill.LinkPath
         }
     }
 
