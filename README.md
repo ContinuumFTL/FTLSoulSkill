@@ -1,29 +1,35 @@
 # FTLSoul Skills
 
-FTLSoul 是一个按单一职责组织的 Agent Skill 仓库。`AGENTS.md` 只负责指向 `ftl-router`；路由器判断请求性质和授权边界，具体纪律放在独立 Skill 中。
+FTLSoul 是一个按单一职责组织的 Agent Skill 仓库。`AGENTS.md` 只负责在本仓库中指向 `ftl-router`；路由器判断请求性质和授权边界，具体纪律放在独立 Skill 中。可直接进入的工作流 Skill 都显式使用 `ftl-soul` 处理面向用户的聊天表达。
 
 ## Skill 目录
 
 | Skill | 职责 | 调用方式 |
 | --- | --- | --- |
-| `ftl-router` | 判断请求、授权边界和下游路线 | 由 `AGENTS.md` 指向的编排入口 |
-| `ftl-simple-change` | 实施用户已明确决定的小改动 | 由入口调用 |
-| `ftl-requirements` | 澄清、记录和确认复杂需求 | 由入口调用 |
-| `ftl-requirements-execution` | 执行已确认需求并完成整体验收 | 由需求流程交接 |
+| `ftl-router` | 判断请求、授权边界和下游路线 | 本仓库的编排入口，也可显式调用 |
+| `ftl-simple-change` | 实施用户已明确决定的小改动 | 由路由器选择，也可直接匹配 |
+| `ftl-requirements` | 澄清、记录和确认复杂需求 | 由路由器选择，也可直接匹配 |
+| `ftl-requirements-execution` | 执行已确认需求并完成整体验收 | 由需求流程交接，也可直接匹配 |
 | `ftl-local-commit` | 安全创建由上游业务 Skill 定义的本地提交 | 由需要提交的业务 Skill 调用 |
-| `ftl-soul` | 调整最终表达与猫娘口吻 | 最终输出前调用 |
+| `ftl-soul` | 调整任务全程的聊天表达与猫娘口吻 | 由可直接进入的工作流 Skill 调用 |
 
 ```text
 ftl-router
 ├─ ftl-simple-change
-├─ ftl-requirements
-│  └─ ftl-requirements-execution
-└─ ftl-soul
+└─ ftl-requirements
+   └─ ftl-requirements-execution
+
+ftl-router ───────────────────────┐
+ftl-simple-change ────────────────┤
+ftl-requirements ─────────────────┼─→ ftl-soul
+ftl-requirements-execution ───────┘
 
 ftl-simple-change ───────────┐
 ftl-requirements ────────────┼─→ ftl-local-commit
 ftl-requirements-execution ──┘
 ```
+
+`ftl-router` 是推荐的统一入口，但公开工作流被直接匹配时仍会显式使用 `ftl-soul`，避免表达规则依赖单一路径。猫娘表达的规则只维护在 `ftl-soul`；其他 Skill 只保留调用指针。它处理 commentary、澄清问题、状态更新和最终回复，不改写需求文档、代码、命令、结构化数据或提交信息。
 
 所有 Skill（包括路由器）都位于自己的目录并拥有独立 `SKILL.md`。上游业务 Skill 决定为什么提交、何时提交以及提交哪些内容，`ftl-local-commit` 只负责安全完成该本地提交。依赖保持单向，避免循环调用；没有真实用途的共享目录、占位资源和停用模块不进入仓库。
 
