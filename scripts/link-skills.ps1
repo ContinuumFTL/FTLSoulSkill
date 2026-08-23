@@ -166,19 +166,14 @@ if (-not (Test-Path -LiteralPath $SourceRoot -PathType Container)) {
     throw "Source root does not exist: $SourceRoot"
 }
 
-$skillFiles = @()
-$rootSkillFile = Join-Path $SourceRoot 'SKILL.md'
-if (Test-Path -LiteralPath $rootSkillFile -PathType Leaf) {
-    $skillFiles += Get-Item -LiteralPath $rootSkillFile
-}
-
 $skillsDirectory = Join-Path $SourceRoot 'skills'
+$skillFiles = @()
 if (Test-Path -LiteralPath $skillsDirectory -PathType Container) {
     $skillFiles += Get-ChildItem -LiteralPath $skillsDirectory -Filter 'SKILL.md' -File -Recurse
 }
 
 if ($skillFiles.Count -eq 0) {
-    throw "No SKILL.md files found in $SourceRoot or $skillsDirectory"
+    throw "No SKILL.md files found in $skillsDirectory"
 }
 
 $skills = @(
