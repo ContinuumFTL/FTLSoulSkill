@@ -27,6 +27,24 @@ ftl-requirements-execution ──┘
 
 所有 Skill（包括路由器）都位于自己的目录并拥有独立 `SKILL.md`。上游业务 Skill 决定为什么提交、何时提交以及提交哪些内容，`ftl-local-commit` 只负责安全完成该本地提交。依赖保持单向，避免循环调用；没有真实用途的共享目录、占位资源和停用模块不进入仓库。
 
+## VS Code 一键 AI Commit
+
+仓库提供 `FTL: AI 分析并提交` 构建任务。在 VS Code 中按 `Ctrl+Shift+B` 即可启动，也可以从“终端 → 运行任务”中选择它。
+
+任务会调用本机已经登录的 Codex CLI：AI 先读取项目规则，审阅 staged、unstaged 和 untracked 变更，检查敏感内容与提交边界，运行项目实际支持的相称验证，再返回精确路径和 Conventional Commit 信息。脚本确认分析期间仓库没有发生变化后，才按 AI 计划暂存并创建一个本地 commit。
+
+使用前需要：
+
+- `git` 和 `codex` 已加入 `PATH`；
+- 已执行 `codex login`；
+- 当前目录是 Git 仓库，且没有冲突、rebase、merge、cherry-pick 等进行中的操作。
+
+脚本不会 push、merge、改写历史或自动清理工作区。若变更无法组成一个安全且完整的提交、验证失败、存在混杂改动，或者 AI 分析期间文件又发生变化，它会停止而不是勉强提交。需要预览 AI 计划但不落 commit 时，可以在终端运行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/ai-commit.ps1 -WhatIf
+```
+
 ## 来源迁移
 
 本结构由 `FTLNekoNekoSkill/skill` 拆分而来。迁移只读取当前有效版本；`.ftlmind/` 历史与缓存、以及已经停用的 `unslop-output.md` 没有迁入。原仓库保留不动，便于迁移结果核对。

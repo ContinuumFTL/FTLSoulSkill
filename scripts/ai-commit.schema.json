@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "should_commit": {
+      "type": "boolean"
+    },
+    "commit_message": {
+      "type": "string"
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "summary": {
+      "type": "string"
+    },
+    "validations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["passed", "skipped"]
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "required": ["command", "status", "details"],
+        "additionalProperties": false
+      }
+    },
+    "failure_reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "should_commit",
+    "commit_message",
+    "paths",
+    "summary",
+    "validations",
+    "failure_reason"
+  ],
+  "additionalProperties": false
+}
