@@ -33,6 +33,10 @@ ftl-requirements-execution ──┘
 
 所有 Skill（包括路由器）都位于自己的目录并拥有独立 `SKILL.md`。上游业务 Skill 决定为什么提交、何时提交以及提交哪些内容，`ftl-local-commit` 只负责安全完成该本地提交。依赖保持单向，避免循环调用；没有真实用途的共享目录、占位资源和停用模块不进入仓库。
 
+## 生成文档
+
+`ftl-requirements` 新建的需求文档统一写入 `docs/ftl/requirements/`，文件名使用 `YYYY-MM-DD-简短标题.md`。只有用户在当前请求中明确指定其他位置时才改变新文档路径；既有需求文档继续原地维护，不会因目录规范更新而被自动迁移或重命名。
+
 ## VS Code 一键 AI Commit
 
 仓库提供 `FTL: AI 分析并提交` 构建任务。在 VS Code 中按 `Ctrl+Shift+B` 即可启动，也可以从“终端 → 运行任务”中选择它。
