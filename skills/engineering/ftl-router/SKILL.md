@@ -1,6 +1,6 @@
 ---
 name: ftl-router
-description: 作为 FTL 工程工作流的推荐统一入口，将软件项目请求路由到只读分析、明确小改动、复杂需求澄清或已确认需求执行流程；适用于需要区分讨论、文档确认与实施授权的项目工作。
+description: 作为 FTL 工程工作流的推荐统一入口，将软件项目请求路由到只读分析、明确小改动、复杂需求澄清、已确认需求执行或项目 harness 治理修改流程；适用于需要区分讨论、文档确认、实施授权与治理层级的项目工作。
 ---
 
 # FTL 工作流路由器
@@ -16,8 +16,14 @@ description: 作为 FTL 工程工作流的推荐统一入口，将软件项目�
 - 回答、解释、讨论、审查、诊断和计划：进行相应分析及必要的只读检查，不修改项目文件，也不顺手实施建议。
 - 只有同时满足以下条件的项目修改才使用 `ftl-simple-change`：目标、预期结果和作用范围均已明确；改动局部、低风险、可撤销且有直接验证方法；不改变 Goal、Milestone、Spec、Plan、Eval、角色契约、授权边界或生命周期等权威语义；也不属于当前有效 Plan。
 - 目标、范围、业务规则或关键取舍仍需共同决定，或者请求涉及需求文档的新建、修订、确认和生命周期：使用 `ftl-requirements`。
+- 当请求的直接目标是创建、修改或替换项目 harness 的治理机制时，被修改的项目 harness 不是该请求的适用执行器：
+  - 治理机制包括角色契约、权威职责、路由与授权规则、Goal／Milestone／Spec／Plan／Implementation／Eval 生命周期、文档协作规则，以及执行这些治理语义的校验脚本；
+  - 关键取舍未确定时使用 `ftl-requirements`；需求已经确认且用户明确要求执行时使用 `ftl-requirements-execution`，不交给项目 Planner，也不要求被修改的 harness 吸收自己的替代规则；
+  - 更新具体产品的 Milestone 状态、Spec 内容、Plan 步骤、Implementation 事实或 Eval 定义与结果仍属于使用项目 harness，不因文件位于 harness 目录而适用本例外；
+  - 同一请求混合治理机制修改和产品开发时按性质拆分，先完成治理修改，再把产品部分交给生效后的项目 harness。不得借治理路线绕过产品 Plan、授权或 Eval。
 - 已确认需求仅因存在或进入`已确认`状态，不自动触发吸收或执行。
 - 用户明确要求吸收或执行一份已经确认但尚未完成的需求文档：先使用 `ftl-requirements` 核对文档状态和当前版本，再读取项目规则判断是否存在适用于该需求的专用 harness。
+  - 需求直接修改项目 harness 治理机制：该 harness 因为是修改对象而不适用；使用 `ftl-requirements-execution`。
   - 存在适用专用 harness：把需求交给该 harness 的 Planner；由 Planner 吸收、协调实施与评估并回写状态。
   - 没有适用专用 harness，但需求自包含且符合通用执行边界：使用 `ftl-requirements-execution` 回退执行。
   - 两者都不适用：说明当前没有执行器，保持`已确认`并停止，不得擅自实施。
@@ -25,7 +31,7 @@ description: 作为 FTL 工程工作流的推荐统一入口，将软件项目�
 
 不能只因项目存在 `AGENTS.md` 就认定专用 harness 适用。根据项目规则、角色契约、当前 Plan 和需求范围判断该 harness 是否真实承担本次工作。
 
-小改动如果会改变权威 harness 语义，或者已经属于当前有效 Plan，即使文件少、代码行数少，也不能走简单修改旁路。`ftl-simple-change` 执行中出现歧义、范围扩大、关键假设失效或风险升级时，把剩余工作重新路由到 `ftl-requirements` 或适用的项目 Planner。
+小改动如果会改变权威 harness 语义，或者已经属于当前有效 Plan，即使文件少、代码行数少，也不能走简单修改旁路。直接改变项目 harness 治理机制时转到 `ftl-requirements`；产品工作或当前 Plan 内工作再按适用项目 harness 处理。`ftl-simple-change` 执行中出现歧义、范围扩大、关键假设失效或风险升级时，同样按这个层级重新路由。
 
 不要预先加载全部下游 Skill。完成判断后，只读取当前路线需要的 Skill。
 

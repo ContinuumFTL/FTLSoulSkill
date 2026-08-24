@@ -1,6 +1,6 @@
 ---
 name: ftl-requirements
-description: 澄清复杂软件需求并创建、维护、确认和吸收带生命周期状态的需求文档；适用于目标或关键取舍尚未确定，以及需求文档的新建、修订、确认、吸收和状态判断，不直接实施项目功能。
+description: 澄清复杂软件需求并创建、维护、确认和吸收带生命周期状态的需求文档；适用于目标或关键取舍尚未确定、项目 harness 治理机制修改，以及需求文档的新建、修订、确认、吸收和状态判断，不直接实施项目功能。
 ---
 
 # 需求澄清与文档生命周期
@@ -64,7 +64,7 @@ description: 澄清复杂软件需求并创建、维护、确认和吸收带生�
 建立时间：YYYY-MM-DDTHH:mm:ss±HH:mm
 确认时间：未确认 | YYYY-MM-DDTHH:mm:ss±HH:mm
 吸收时间：未吸收 | YYYY-MM-DDTHH:mm:ss±HH:mm
-吸收记录：未吸收 | 不适用（无专用 harness） | 实际创建或修改的 harness 路径
+吸收记录：未吸收 | 不适用（无专用 harness） | 不适用（项目 harness 为修改对象，全局执行） | 实际创建或修改的 harness 路径
 执行完毕时间：未执行完毕 | YYYY-MM-DDTHH:mm:ss±HH:mm
 ```
 
@@ -90,6 +90,8 @@ description: 澄清复杂软件需求并创建、维护、确认和吸收带生�
 - 原需求记录实际吸收时间，以及创建或修改的 Milestone、Specs 和 Plans 路径；不适用的类别明确写`不适用`。
 - 只有全部内容已映射或明确无需 harness 变更、没有未解决冲突且追溯路径有效时，才将主状态改为`吸收完毕`。
 
+当需求的直接目标是创建、修改或替换项目 harness 的治理机制时，被修改的 harness 不是适用吸收方。该需求保持`已确认`并在用户明确授权后交给全局 `ftl-requirements-execution`；不得创建治理 Milestone、Spec 或 Plan 来让 harness 吸收自己的替代规则。具体产品 Milestone、Spec、Plan、Implementation 和 Eval 的日常内容更新仍按项目 harness 吸收与执行规则处理。
+
 Generator、Evaluator 和 Skill 本身不作为独立状态修改者。由项目 Planner 在遵循本 Skill 生命周期规则时回写需求状态。
 
 ## 保持当前需求自包含
@@ -105,7 +107,7 @@ Generator、Evaluator 和 Skill 本身不作为独立状态修改者。由项目
 仍有关键缺口或用户提出修改时，保持 `编辑中` 并继续讨论。文档已经完善时，明确提供：
 
 - `A：确认定稿`：确认并提交需求文档，不实施项目功能。
-- `B：确认定稿并执行`：先确认并提交需求文档，再按项目规则选择适用的专用 Planner harness；只有没有适用专用 harness 且符合通用执行边界时，才交给 `ftl-requirements-execution`。
+- `B：确认定稿并执行`：先确认并提交需求文档。需求直接修改项目 harness 治理机制时，该 harness 不视为适用执行器，交给全局 `ftl-requirements-execution`；其他需求再按项目规则优先选择适用的专用 Planner harness，没有适用 harness 且符合通用执行边界时使用回退执行。
 
 只有用户明确选择 A 或 B，才把对应文档改为 `已确认` 并写入实际确认时间。含糊回答不能推定为确认或执行授权。
 
@@ -115,4 +117,4 @@ Generator、Evaluator 和 Skill 本身不作为独立状态修改者。由项目
 
 无法创建提交时如实说明，不伪造提交，也不把文档确认提交失败解释为功能执行授权。
 
-选择 A 后结束，不吸收或执行项目功能。选择 B 后把当前已确认文档和明确执行意图交回统一路由：适用专用 Planner harness 优先，`ftl-requirements-execution` 只作无专用 harness 时的回退。
+选择 A 后结束，不吸收或执行项目功能。选择 B 后把当前已确认文档和明确执行意图交回统一路由：直接修改项目 harness 治理机制时使用全局 `ftl-requirements-execution`；其他需求适用专用 Planner harness 优先，通用执行只在没有适用 harness 时回退。
