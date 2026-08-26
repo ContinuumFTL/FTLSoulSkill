@@ -1,33 +1,60 @@
 # FTLSoul Skills
 
-FTLSoul 是一个按单一职责组织的 Agent Skill 仓库。`AGENTS.md` 只负责在本仓库中指向 `ftl-router`；路由器判断请求性质和授权边界，具体纪律放在独立 Skill 中。可直接进入的工作流 Skill 都显式使用 `ftl-soul` 处理面向用户的聊天表达。
+FTLSoul 是一个按单一职责组织的用户级 Agent Skill 仓库。它运行在具体项目 Harness 之外，负责通用的任务分类、需求澄清、执行授权和回退执行；进入项目后先读取并尊重项目实际声明的规则，不把 FTLSoul 角色或生命周期描述成项目 Harness 的组成部分。
+
+本仓库的 `AGENTS.md` 只负责指向 `ftl-router`；路由器判断请求性质和授权边界，具体纪律放在独立 Skill 中。可直接进入的工作流 Skill 都显式使用 `ftl-soul` 处理面向用户的聊天表达。
 
 ## Skill 目录
 
 | Skill | 职责 | 调用方式 |
 | --- | --- | --- |
-| `ftl-router` | 判断请求、授权边界和下游路线 | 本仓库的编排入口，也可显式调用 |
-| `ftl-simple-change` | 实施用户已明确决定的小改动 | 由路由器选择，也可直接匹配 |
-| `ftl-requirements` | 澄清、记录和确认复杂需求 | 由路由器选择，也可直接匹配 |
-| `ftl-requirements-execution` | 执行已确认需求并完成整体验收 | 由需求流程交接，也可直接匹配 |
+| `ftl-router` | 判断请求、授权边界、项目工作流和全局回退路线 | 本仓库的编排入口，也可显式调用 |
+| `ftl-simple-change` | 实施未被项目专用工作流接管的明确小改动 | 由路由器选择，也可直接匹配 |
+| `ftl-requirements` | 澄清、记录和确认复杂需求，并选择实际执行器 | 由路由器选择，也可直接匹配 |
+| `ftl-requirements-execution` | 在没有适用项目工作流或目标 Harness 正被修改时执行已确认需求 | 由需求流程交接，也可直接匹配 |
 | `ftl-local-commit` | 安全创建由上游业务 Skill 定义的本地提交 | 由需要提交的业务 Skill 调用 |
 | `ftl-soul` | 调整任务全程的聊天表达与猫娘口吻 | 由可直接进入的工作流 Skill 调用 |
 
-```text
-ftl-router
-├─ ftl-simple-change
-└─ ftl-requirements
-   └─ ftl-requirements-execution
+```mermaid
+flowchart TD
+    U[用户请求] --> R[ftl-router]
+    R --> P[读取项目规则与真实状态]
+    P --> K{请求性质}
 
-ftl-router ───────────────────────┐
-ftl-simple-change ────────────────┤
-ftl-requirements ─────────────────┼─→ ftl-soul
-ftl-requirements-execution ───────┘
+    K -->|只读分析| A[调查并回答]
+    K -->|明确小改动| S[ftl-simple-change]
+    K -->|关键取舍未定| Q[ftl-requirements]
+    K -->|明确但不是小改动| NW{项目是否声明适用工作流}
+    K -->|执行已确认需求| V[ftl-requirements：核对状态与版本]
+    K -->|修改项目 Harness 治理机制| Q
 
-ftl-simple-change ───────────┐
-ftl-requirements ────────────┼─→ ftl-local-commit
-ftl-requirements-execution ──┘
+    NW -->|是| H
+    NW -->|否| Q
+    V --> W{项目是否声明适用工作流}
+
+    Q --> C{用户选择}
+    C -->|继续讨论| Q
+    C -->|A：确认定稿| D[确认需求文档]
+    C -->|B：确认并执行| D
+    D --> LC[ftl-local-commit：需求确认]
+    LC --> X{是否有明确执行授权}
+    X -->|否| Z[仅完成需求确认]
+    X -->|是| W
+
+    W -->|是| H[项目自己的 Harness 工作流]
+    W -->|否| E[ftl-requirements-execution]
+    W -->|目标 Harness 正被修改| E
+
+    S --> L[ftl-local-commit：实现检查点]
+    E --> L
+
+    R -.聊天表达.-> N[ftl-soul]
+    S -.聊天表达.-> N
+    Q -.聊天表达.-> N
+    E -.聊天表达.-> N
 ```
+
+图中的“项目自己的 Harness 工作流”属于目标项目，不属于 FTLSoul。项目存在 `AGENTS.md`、测试或某类文档并不自动证明存在适用执行器；只有项目规则和真实入口明确承担当前任务时才交接。项目 Harness 治理机制本身是修改对象时，全局执行器保留在目标规则之外，避免要求旧规则吸收或批准自己的替代方案。
 
 `ftl-router` 是推荐的统一入口，但公开工作流被直接匹配时仍会显式使用 `ftl-soul`，避免表达规则依赖单一路径。猫娘表达的规则只维护在 `ftl-soul`；其他 Skill 只保留调用指针。它处理 commentary、澄清问题、状态更新和最终回复，不改写需求文档、代码、命令、结构化数据或提交信息。
 
@@ -35,7 +62,9 @@ ftl-requirements-execution ──┘
 
 ## 生成文档
 
-`ftl-requirements` 新建的需求文档统一写入 `docs/ftl/requirements/`，文件名使用 `YYYY-MM-DD-简短标题.md`。只有用户在当前请求中明确指定其他位置时才改变新文档路径；既有需求文档继续原地维护，不会因目录规范更新而被自动迁移或重命名。
+`ftl-requirements` 新建的需求文档统一写入 `docs/ftl/requirements/`，文件名使用 `YYYY-MM-DD-简短标题.md`。只有用户在当前请求中明确指定其他位置时才改变新文档路径；项目自定义目录不会覆盖这项全局约定。既有需求文档继续原地维护，不会因目录规范更新而被自动迁移或重命名。
+
+新文档的默认生命周期是`编辑中`、`已确认`和`执行完毕`。项目可以声明额外状态和工作流；FTLSoul 只在当前任务实际适用时遵循，不把某个项目的规划、吸收或评估结构推广到其他项目。
 
 ## VS Code 一键 AI Commit
 
