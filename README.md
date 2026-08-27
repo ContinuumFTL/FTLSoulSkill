@@ -9,6 +9,7 @@ FTLSoul 是一个按单一职责组织的用户级 Agent Skill 仓库。它运�
 | Skill | 职责 | 调用方式 |
 | --- | --- | --- |
 | `ftl-router` | 区分只读讨论、形成需求和明确实施，并选择项目工作流或全局回退路线 | 本仓库的编排入口，也可显式调用 |
+| `ftl-codex-auth-diagnostics` | 区分真正缺少登录、选错 Codex CLI 与 Windows 安全身份或凭据上下文隔离 | 由路由器在 Codex 登录失败或状态矛盾时选择，也可直接匹配 |
 | `ftl-simple-change` | 实施未被项目专用工作流接管的明确小改动 | 由路由器选择，也可直接匹配 |
 | `ftl-requirements` | 澄清、记录和确认复杂需求，并选择实际执行器 | 由路由器选择，也可直接匹配 |
 | `ftl-requirements-execution` | 在没有适用项目工作流或目标 Harness 正被修改时执行已确认需求 | 由需求流程交接，也可直接匹配 |
@@ -18,7 +19,11 @@ FTLSoul 是一个按单一职责组织的用户级 Agent Skill 仓库。它运�
 ```mermaid
 flowchart TD
     U[用户请求] --> R[ftl-router]
-    R --> P[读取项目规则与真实状态]
+    R --> CA{Codex 登录故障或状态矛盾}
+    CA -->|是| AD[ftl-codex-auth-diagnostics]
+    CA -->|否| P[读取项目规则与真实状态]
+    AD -->|只读诊断结论| A
+    AD -->|用户要求项目修复| P
     P --> K{请求性质}
 
     K -->|只读讨论| A[调查并回答]
@@ -52,12 +57,15 @@ flowchart TD
     E --> L
 
     R -.聊天表达.-> N[ftl-soul]
+    AD -.聊天表达.-> N
     S -.聊天表达.-> N
     Q -.聊天表达.-> N
     E -.聊天表达.-> N
 ```
 
 三条顶层路线按用户当前意图区分。项目话题、计划是否具体、是否存在设计取舍都不会自动把普通讨论升级成需求流程：自由探讨保持只读；只有用户明确希望形成后续工作依据或维护需求文档时才进入 `ftl-requirements`；明确实施后再按范围选择小改动、项目工作流或已确认需求执行。
+
+Codex CLI、Codex App Server 或依赖它们的项目报告 `Not logged in`、要求设备码授权、出现宿主与 Agent 登录状态矛盾或疑似选错 CLI 时，路由器先调用 `ftl-codex-auth-diagnostics`。该 Skill 只读比较可执行文件、版本、Windows 安全身份、配置环境和凭据元数据；它不会读取凭据内容、自动登录或把沙箱中的未登录状态直接解释为用户未登录。
 
 `ftl-requirements` 需要共同决定需求内容时，会读取其内部的原版 `grilling` 快照，用决策树和 frontier 分轮访谈。该快照来自 `mattpocock/skills` 的 commit `85f83d3fde1d3a90d5c9a657f6998c79a6c37308`，内容保持原样并附带 MIT 许可证通知；它不是独立 Skill 或顶层路由。访谈完成、需求确认和实施授权仍是三个不同事件。
 
