@@ -11,8 +11,8 @@ FTLSoul 是一个按单一职责组织的用户级 Agent Skill 仓库。它运�
 | `ftl-router` | 区分只读讨论、形成需求和明确实施，并选择项目工作流或全局回退路线 | 本仓库的编排入口，也可显式调用 |
 | `ftl-codex-sandbox-auth-recovery` | 宿主 Codex 已登录而 Agent 沙箱报告未登录时，把已授权的 Codex 父命令恢复到宿主用户上下文 | 由路由器在已知沙箱凭据隔离故障时选择，也可直接匹配 |
 | `ftl-simple-change` | 实施未被项目专用工作流接管的明确小改动 | 由路由器选择，也可直接匹配 |
-| `ftl-requirements` | 澄清、记录和确认复杂需求，并选择实际执行器 | 由路由器选择，也可直接匹配 |
-| `ftl-requirements-execution` | 在没有适用项目工作流或目标 Harness 正被修改时执行已确认需求 | 由需求流程交接，也可直接匹配 |
+| `ftl-requirements` | 澄清、记录和确认复杂需求；选择 B 后以自包含目标交给实际执行器 | 由路由器选择，也可直接匹配 |
+| `ftl-requirements-execution` | 在没有适用项目工作流或目标 Harness 正被修改时执行已确认需求，并处理目标中的人工验收关口 | 由需求流程交接，也可直接匹配 |
 | `ftl-local-commit` | 安全创建由上游业务 Skill 定义的本地提交 | 由需要提交的业务 Skill 调用 |
 | `ftl-soul` | 调整任务全程的聊天表达与猫娘口吻 | 由可直接进入的工作流 Skill 调用 |
 
@@ -48,9 +48,11 @@ flowchart TD
     X -->|否| Z[仅完成需求确认]
     X -->|是| W
 
-    W -->|是| H[项目自己的 Harness 工作流]
-    W -->|否| E[ftl-requirements-execution]
-    W -->|目标 Harness 正被修改| E
+    W -->|是| GH[创建自包含 /goal]
+    W -->|否| GE[创建自包含 /goal]
+    W -->|目标 Harness 正被修改| GE
+    GH --> H[项目自己的 Harness 工作流]
+    GE --> E[ftl-requirements-execution]
 
     S --> L[ftl-local-commit：实现检查点]
     E --> L
@@ -63,6 +65,11 @@ flowchart TD
 ```
 
 三条顶层路线按用户当前意图区分。项目话题、计划是否具体、是否存在设计取舍都不会自动把普通讨论升级成需求流程：自由探讨保持只读；只有用户明确希望形成后续工作依据或维护需求文档时才进入 `ftl-requirements`；明确实施后再按范围选择小改动、项目工作流或已确认需求执行。
+
+用户选择 `B：确认定稿并执行` 后，FTLSoul 先确认并提交需求文档、解析实际执行器，再创建
+自包含的 `/goal`；目标正文包含文档路径、执行授权、执行器、停止条件和授权边界，不能只是
+一个 `B`。目标遇到人工验收时先冻结待测状态，自动续跑每回合只做一次直接相关的最小权威
+检查；用户用普通自然语言返回结果后，当前回合把它作为原目标证据并继续剩余工作。
 
 普通 Windows 终端中的目标 Codex CLI 已登录、但 Agent 沙箱或其子进程对同一 CLI 报告 `Not logged in` 或要求设备码时，路由器直接调用 `ftl-codex-sandbox-auth-recovery`。该 Skill 不再展开完整诊断，而是先在宿主上下文做一次无模型的最短登录检查，然后把真正启动 Codex 的整个父级项目命令放到已登录的宿主用户上下文执行。它不会重新登录、复制凭据，或把仅更换 `codex.ps1`、`codex.cmd`、`codex.exe` 包装器当成修复。
 
