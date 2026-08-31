@@ -15,6 +15,7 @@ FTLSoul 是一个按单一职责组织的用户级 Agent Skill 仓库。它运�
 | `ftl-router` | 区分只读讨论、形成需求和明确实施，并选择项目工作流或全局回退路线 | 本仓库的编排入口，也可显式调用 |
 | `ftl-codex-sandbox-auth-recovery` | 宿主 Codex 已登录而 Agent 沙箱报告未登录时，把已授权的 Codex 父命令恢复到宿主用户上下文 | 由路由器在已知沙箱凭据隔离故障时选择，也可直接匹配 |
 | `ftl-simple-change` | 实施未被项目专用工作流接管的明确小改动 | 由路由器选择，也可直接匹配 |
+| `ftl-vscode-launch` | 为项目创建、合并并验证 VS Code 一键启动配置 | 用户要求配置 F5、Run and Debug 或复用 launch.json 规则时直接匹配 |
 | `ftl-requirements` | 澄清、记录和确认复杂需求；选择 B 后以自包含目标交给实际执行器 | 由路由器选择，也可直接匹配 |
 | `ftl-requirements-execution` | 在没有适用项目工作流或目标 Harness 正被修改时执行已确认需求，并处理目标中的人工验收关口 | 由需求流程交接，也可直接匹配 |
 | `ftl-local-commit` | 安全创建由上游业务 Skill 定义的本地提交 | 由需要提交的业务 Skill 调用 |
