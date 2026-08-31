@@ -106,3 +106,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/ai-commit.ps1 -WhatI
 ## 来源迁移
 
 本结构由 `FTLNekoNekoSkill/skill` 拆分而来。迁移只读取当前有效版本；`.ftlmind/` 历史与缓存、以及已经停用的 `unslop-output.md` 没有迁入。原仓库保留不动，便于迁移结果核对。
+
+## 许可证
+
+本项目采用 [Apache License 2.0](LICENSE) 开源许可证。

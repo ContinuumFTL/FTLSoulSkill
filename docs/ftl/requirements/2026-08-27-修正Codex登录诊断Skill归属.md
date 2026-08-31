@@ -7,7 +7,7 @@
 
 ## 背景与目标
 
-此前已确认并实施 Codex CLI 登录失败的全局只读诊断方案，但误把 `C:\Users\Administrator\.agents\skills` 当作权威源码位置。FTLSoul Skill 的真实源码仓库是 `Z:\Code\FTLSoulSkill`；用户安装目录只应包含由仓库脚本维护、指向该仓库源码的目录链接。
+此前已确认并实施 Codex CLI 登录失败的全局只读诊断方案，但误把 `%USERPROFILE%\.agents\skills` 当作权威源码位置。FTLSoul Skill 的真实源码仓库是 `<仓库根目录>`；用户安装目录只应包含由仓库脚本维护、指向该仓库源码的目录链接。
 
 本次修正要把诊断 Skill 纳入 FTLSoulSkill 仓库，使路由、版本控制、README 和用户安装链接拥有单一事实来源，同时清理此次误放产生的独立副本和错误项目记录。
 
@@ -16,8 +16,8 @@
 - 在 `skills/engineering/ftl-codex-auth-diagnostics/SKILL.md` 保存诊断 Skill 源码。
 - 保留并提交 `skills/engineering/ftl-router/SKILL.md` 中的 Codex 登录失败专用路由。
 - 更新 `README.md` 的 Skill 清单和路由图，使其包含新诊断 Skill。
-- 使用 `scripts/link-skills.ps1` 将 `C:\Users\Administrator\.agents\skills\ftl-codex-auth-diagnostics` 替换为指向仓库源码的受管目录链接，并更新链接清单。
-- 从 `Z:\Code\CodexTalk` 当前版本中删除误放的需求记录；不改写已经产生的 Git 历史，只创建前向清理提交。
+- 使用 `scripts/link-skills.ps1` 将 `%USERPROFILE%\.agents\skills\ftl-codex-auth-diagnostics` 替换为指向仓库源码的受管目录链接，并更新链接清单。
+- 从 `<CodexTalk 仓库根目录>` 当前版本中删除误放的需求记录；不改写已经产生的 Git 历史，只创建前向清理提交。
 - 删除本次误安装所产生、经核对只属于本任务的临时暂存目录；不触碰其他未跟踪文件。
 
 ## 保留的诊断与安全规则
@@ -39,8 +39,8 @@
 
 ## 实施结果
 
-- 诊断 Skill 源码已纳入 `Z:\Code\FTLSoulSkill\skills\engineering\ftl-codex-auth-diagnostics\SKILL.md`，路由与 README 已同步更新。
-- 用户安装路径 `C:\Users\Administrator\.agents\skills\ftl-codex-auth-diagnostics` 已由独立目录替换为指向仓库源码的受管符号链接，链接清单已包含该 Skill。
+- 诊断 Skill 源码已纳入 `<仓库根目录>\skills\engineering\ftl-codex-auth-diagnostics\SKILL.md`，路由与 README 已同步更新。
+- 用户安装路径 `%USERPROFILE%\.agents\skills\ftl-codex-auth-diagnostics` 已由独立目录替换为指向仓库源码的受管符号链接，链接清单已包含该 Skill。
 - 仓库内全部七个 Skill 均通过 Skill Creator 结构校验；最终审计确认四类诊断分支、路由引用、安装目标和清单记录全部存在。
-- `Z:\Code\CodexTalk` 中误放的需求记录已通过前向清理提交删除，本任务创建的专用暂存目录也已删除；其他未跟踪文件未触碰。
+- `<CodexTalk 仓库根目录>` 中误放的需求记录已通过前向清理提交删除，本任务创建的专用暂存目录也已删除；其他未跟踪文件未触碰。
 - `ftl-soul` 未修改；实施过程未执行登录、登出、设备码授权、凭据读取、App Server 启动或模型调用。

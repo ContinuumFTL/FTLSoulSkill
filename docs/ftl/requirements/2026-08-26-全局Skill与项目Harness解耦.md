@@ -31,7 +31,7 @@
 - `skills/engineering/ftl-requirements-execution/SKILL.md`
 - `README.md`
 
-安装目录 `C:\Users\Administrator\.agents\skills\` 当前通过符号链接指向本仓库，不单独编辑。`AGENTS.md`、`ftl-local-commit`、`ftl-soul`、链接脚本和 AI commit 脚本不在修改范围。
+安装目录 `%USERPROFILE%\.agents\skills\` 当前通过符号链接指向本仓库，不单独编辑。`AGENTS.md`、`ftl-local-commit`、`ftl-soul`、链接脚本和 AI commit 脚本不在修改范围。
 
 ## 验收预期
 
