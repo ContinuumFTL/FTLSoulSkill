@@ -1,9 +1,9 @@
 # 新增 FTLSoul 仓库 Skill 编写规范
 
-状态：已确认
+状态：执行完毕
 建立时间：2026-08-31T19:15:17+08:00
 确认时间：2026-08-31T19:22:07+08:00
-执行完毕时间：未执行完毕
+执行完毕时间：2026-08-31T19:41:23+08:00
 
 ## 关联基线
 
@@ -68,3 +68,13 @@
 - 校验脚本能拒绝本次已经修复过的段落硬折行形态，并允许代码围栏、真正嵌套列表、表格、引用块和明确硬换行。
 - 仓库现有全部 Skill 均能通过新增排版校验、Skill Creator 校验和链接预演；实施不改变现有 Skill 的授权、路由或生命周期语义，除新增的编写规范及其必要路由外。
 - 实施提交只包含本需求允许的 Skill、校验脚本、路由、README 和需求生命周期更新；不修改 C 盘安装内容，不执行 push。
+
+## 实施结果
+
+- 已新增 `skills/engineering/ftl-skill-authoring/SKILL.md` 和 `skills/engineering/ftl-skill-authoring/scripts/validate-skill-markdown.ps1`，并通过 `ftl-router` 与 README 暴露仓库编写入口；实现检查点为 `5658227`（`feat: add FTLSoul skill authoring standard`）。
+- 状态提交前审阅发现校验器相对路径可能被其他项目工作目录错误解析，已按检查点纪律创建前向修复 `ed5b609`（`fix: use canonical validator path in authoring skill`），将调用路径完整锚定到 Z 盘；未 amend 或 squash 已有提交。
+- 新 Skill 将 `Z:\Code\FTLSoulSkill` 固定为本机权威源码根目录，要求验证 Git 根目录、仓库签名文件和受管 `sourceRoot`；C 盘用户目录、Codex Skill 目录及插件缓存均不得作为源码编辑目标，来源冲突时停止而不回退修改副本。
+- 已安装的 `C:\Users\Administrator\.agents\skills\ftl-router` 经核对是指向 Z 盘路由器的受管符号链接，并能直接读取新规范的 Z 盘精确路径；因此即使没有修改 C 盘安装内容，其他项目会话通过现有路由器也能定位权威 Skill。
+- 排版校验器已用负向夹具验证能够同时拒绝 frontmatter、普通段落和列表项续行，用正向夹具验证代码围栏、嵌套列表、表格、引用和显式 Markdown 硬换行不会误报；临时夹具及空目录均已清理。
+- 仓库 10 个 Skill 均通过 Skill Creator `quick_validate.py` 和整仓 Markdown 排版校验；`scripts/link-skills.ps1 -WhatIf` 成功识别 `ftl-skill-authoring` 并完成预演，未写入清单或用户安装目录。
+- `git diff --check`、提交后工作树检查、权威 Git 根目录与受管清单一致性检查均通过；实施未执行用户目录同步、push、合并、PR、部署、发布或历史改写。
