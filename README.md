@@ -1,5 +1,9 @@
 # FTLSoul Skills
 
+<p align="center">
+  <img src="assets/neko.png" alt="FTLSoul 猫猫" width="720">
+</p>
+
 FTLSoul 是一个按单一职责组织的用户级 Agent Skill 仓库。它运行在具体项目 Harness 之外，负责通用的任务分类、需求澄清、执行授权和回退执行；进入项目后先读取并尊重项目实际声明的规则，不把 FTLSoul 角色或生命周期描述成项目 Harness 的组成部分。
 
 本仓库的 `AGENTS.md` 只负责指向 `ftl-router`；路由器判断请求性质和授权边界，具体纪律放在独立 Skill 中。可直接进入的工作流 Skill 都显式使用 `ftl-soul` 处理面向用户的聊天表达。
