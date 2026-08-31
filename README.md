@@ -13,6 +13,7 @@ FTLSoul 是一个按单一职责组织的用户级 Agent Skill 仓库。它运�
 | Skill | 职责 | 调用方式 |
 | --- | --- | --- |
 | `ftl-router` | 区分只读讨论、形成需求和明确实施，并选择项目工作流或全局回退路线 | 本仓库的编排入口，也可显式调用 |
+| `ftl-skill-authoring` | 约束 FTLSoul Skill 的权威源码位置、Markdown 排版和仓库验证 | 创建、修改、审查或格式化 FTLSoul Skill 时由路由器选择，也可直接匹配 |
 | `ftl-codex-sandbox-auth-recovery` | 宿主 Codex 已登录而 Agent 沙箱报告未登录时，把已授权的 Codex 父命令恢复到宿主用户上下文 | 由路由器在已知沙箱凭据隔离故障时选择，也可直接匹配 |
 | `ftl-simple-change` | 实施未被项目专用工作流接管的明确小改动 | 由路由器选择，也可直接匹配 |
 | `ftl-vscode-launch` | 为项目创建、合并并验证 VS Code 一键启动配置 | 用户要求配置 F5、Run and Debug 或复用 launch.json 规则时直接匹配 |
@@ -31,6 +32,7 @@ flowchart TD
     AR -->|立即恢复当前命令| HR[宿主用户上下文]
     AR -->|长期修复项目| P
     P --> K{请求性质}
+    P -.目标是 FTLSoul Skill.-> SA[ftl-skill-authoring]
 
     K -->|只读讨论| A[调查并回答]
     K -->|形成需求| Q[ftl-requirements]
@@ -67,6 +69,7 @@ flowchart TD
     R -.聊天表达.-> N[ftl-soul]
     AR -.聊天表达.-> N
     B -.聊天表达.-> N
+    SA -.聊天表达.-> N
     S -.聊天表达.-> N
     Q -.聊天表达.-> N
     E -.聊天表达.-> N
@@ -91,6 +94,8 @@ Chrome 或 Edge，也不会为同一登录或设备授权流程同时打开两�
 `ftl-router` 是推荐的统一入口，但公开工作流被直接匹配时仍会显式使用 `ftl-soul`，避免表达规则依赖单一路径。猫娘表达的规则只维护在 `ftl-soul`；其他 Skill 只保留调用指针。它处理 commentary、澄清问题、状态更新和最终回复，不改写需求文档、代码、命令、结构化数据或提交信息。
 
 所有 Skill（包括路由器）都位于自己的目录并拥有独立 `SKILL.md`。上游业务 Skill 决定为什么提交、何时提交以及提交哪些内容，`ftl-local-commit` 只负责安全完成该本地提交。依赖保持单向，避免循环调用；没有真实用途的共享目录、占位资源和停用模块不进入仓库。
+
+编写 FTLSoul Skill 时使用 `ftl-skill-authoring`。本机权威源码根目录是 `Z:\Code\FTLSoulSkill`；C 盘用户 Skill 目录和插件缓存只作为安装或发现表面，即使当前是指向 Z 盘的目录链接，编辑、差异和提交仍使用 Z 盘规范路径。普通 Markdown 段落和列表项保持一个语义块一个物理行，不按固定显示宽度硬折行；仓库内置校验脚本会在提交前检查这一约束。
 
 ## 生成文档
 
