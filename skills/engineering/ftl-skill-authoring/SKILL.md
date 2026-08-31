@@ -37,6 +37,6 @@ description: 为 FTLSoulSkill 仓库创建、修改、审查和格式化 Skill�
 ## 验证与提交
 
 - 对新增或修改的 Skill 运行 `skill-creator` 提供的 `quick_validate.py`；Windows 默认编码不能读取 UTF-8 时使用 Python UTF-8 模式重跑，不把环境编码错误报告为 Skill 内容错误。
-- 运行 `scripts/validate-skill-markdown.ps1` 检查整个 `Z:\Code\FTLSoulSkill\skills`。修复全部普通段落、列表项和 frontmatter 续行；代码围栏、真正嵌套列表、表格、引用块和明确硬换行不得误报。
+- 运行 `Z:\Code\FTLSoulSkill\skills\engineering\ftl-skill-authoring\scripts\validate-skill-markdown.ps1` 检查整个 `Z:\Code\FTLSoulSkill\skills`。修复全部普通段落、列表项和 frontmatter 续行；代码围栏、真正嵌套列表、表格、引用块和明确硬换行不得误报。
 - 从仓库根目录运行 `scripts/link-skills.ps1 -WhatIf`，验证 frontmatter、名称唯一性和受管链接集合；没有单独授权时使用隔离的预演目标，不实际同步用户目录。
 - 运行 `git diff --check`，审计精确路径和实际差异，并执行与修改风险相称的内容或行为检查。验证通过后由适用上游流程使用 `ftl-local-commit` 创建隔离的本地提交；不得由源码编辑推导 push、合并、发布或其他外部动作。
