@@ -17,6 +17,7 @@ FTLSoul 是一个按单一职责组织的用户级 Agent Skill 仓库。它运�
 | `ftl-codex-sandbox-auth-recovery` | 宿主 Codex 已登录而 Agent 沙箱报告未登录时，把已授权的 Codex 父命令恢复到宿主用户上下文 | 由路由器在已知沙箱凭据隔离故障时选择，也可直接匹配 |
 | `ftl-simple-change` | 实施未被项目专用工作流接管的明确小改动 | 由路由器选择，也可直接匹配 |
 | `ftl-vscode-launch` | 为项目创建、合并并验证 VS Code 一键启动配置 | 用户要求配置 F5、Run and Debug 或复用 launch.json 规则时直接匹配 |
+| `ftl-github-push` | 审查待推送提交、GitHub 目标与隐私风险，执行普通精确推送并核对远端 SHA | 用户当前明确要求推送、发布或更新 GitHub 时自动匹配，也可显式调用 |
 | `ftl-requirements` | 澄清、记录和确认复杂需求；选择 B 后以自包含目标交给实际执行器 | 由路由器选择，也可直接匹配 |
 | `ftl-requirements-execution` | 在没有适用项目工作流或目标 Harness 正被修改时执行已确认需求，并处理目标中的人工验收关口 | 由需求流程交接，也可直接匹配 |
 | `ftl-local-commit` | 安全创建由上游业务 Skill 定义的本地提交 | 由需要提交的业务 Skill 调用 |
@@ -33,6 +34,7 @@ flowchart TD
     AR -->|长期修复项目| P
     P --> K{请求性质}
     P -.目标是 FTLSoul Skill.-> SA[ftl-skill-authoring]
+    P -.明确 GitHub 推送.-> GP[ftl-github-push]
 
     K -->|只读讨论| A[调查并回答]
     K -->|形成需求| Q[ftl-requirements]
@@ -69,6 +71,7 @@ flowchart TD
     R -.聊天表达.-> N[ftl-soul]
     AR -.聊天表达.-> N
     B -.聊天表达.-> N
+    GP -.聊天表达.-> N
     SA -.聊天表达.-> N
     S -.聊天表达.-> N
     Q -.聊天表达.-> N
@@ -81,6 +84,8 @@ flowchart TD
 或 CLI 是否能够完成语义操作；确需浏览器时默认只使用 Codex 内置浏览器，不会静默切换到
 Chrome 或 Edge，也不会为同一登录或设备授权流程同时打开两个浏览器。内置浏览器无法完成时，
 先说明失败并等待用户决定是否切换。普通互联网资料检索不走这条交互式浏览器路径。
+
+用户当前明确要求把已有提交推送到 GitHub 时，`ftl-github-push` 会先锁定远端和分支，查询真实远端 SHA，检查待推送提交中的凭据、本机路径、个人信息和异常文件，再做精确 refspec 的预演与普通推送。干净且目标唯一的普通更新不重复确认；出现隐私警告、首次发布、远端漂移或高可信秘密时会停下来。该 Skill 不自动提交工作区，也不会强推、改写历史或修改 GitHub 仓库设置。
 
 用户选择 `B：确认定稿并执行` 后，FTLSoul 先确认并提交需求文档、解析实际执行器，再创建
 自包含的 `/goal`；目标正文包含文档路径、执行授权、执行器、停止条件和授权边界，不能只是
