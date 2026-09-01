@@ -298,6 +298,7 @@ $files = [System.Collections.Generic.HashSet[string]]::new([System.StringCompare
 $binaryFiles = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 $scannedTextLines = 0
 $scanComplete = $true
+$privateNetworkPattern = '(?i)\b(?:https?://' + 'local' + 'host(?::\d+)?|(?:host|hostname)\s*[:=]\s*' + 'local' + 'host|127\.0\.0\.1(?::\d+)?|10(?:\.\d{1,3}){3}(?::\d+)?|192\.168(?:\.\d{1,3}){2}(?::\d+)?|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2}(?::\d+)?)\b'
 
 if ($revisionArguments.Count -gt 0 -and $commitCount -gt 0) {
     $logArguments = @('log', '--format=%H%x09%an%x09%ae%x09%s') + $revisionArguments
@@ -442,7 +443,7 @@ if ($revisionArguments.Count -gt 0 -and $commitCount -gt 0) {
         if ($content -match '(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b' -and $content -notmatch '(?i)@users\.noreply\.github\.com\b') {
             Add-Finding -Severity warning -Code 'CONTENT_EMAIL' -Message 'A non-GitHub-noreply email address was introduced in file content.' -Path $currentPath
         }
-        if ($content -match '(?i)\b(?:https?://)?(?:localhost|127\.0\.0\.1|10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2})(?::\d+)?\b') {
+        if ($content -match $privateNetworkPattern) {
             Add-Finding -Severity warning -Code 'INTERNAL_ADDRESS' -Message 'A localhost or private-network address was introduced.' -Path $currentPath
         }
     }

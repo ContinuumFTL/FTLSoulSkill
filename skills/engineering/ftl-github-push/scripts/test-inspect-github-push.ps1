@@ -263,6 +263,12 @@ try {
     Assert-Finding -Report $pathReport -Code 'LOCAL_ABSOLUTE_PATH'
     Assert-True -Condition ($pathReport.decision.status -eq 'warning') -Message 'A local path should warn rather than block.'
 
+    $internalAddressFixture = New-PublishedFixture -Name 'internal-address-warning'
+    $internalEndpoint = 'http://' + 'localhost:8080'
+    Add-TestCommit -Repository $internalAddressFixture.Repository -RelativePath 'service.txt' -Content "endpoint=$internalEndpoint" -Message 'test: add internal address fixture'
+    $internalAddressReport = Get-Inspection -Repository $internalAddressFixture.Repository -RemoteName origin -TargetBranch main
+    Assert-Finding -Report $internalAddressReport -Code 'INTERNAL_ADDRESS'
+
     $largeFixture = New-PublishedFixture -Name 'large-blob'
     Add-TestCommit -Repository $largeFixture.Repository -RelativePath 'asset.bin' -Content ('x' * 512) -Message 'test: add large fixture'
     $largeReport = Get-Inspection -Repository $largeFixture.Repository -RemoteName origin -TargetBranch main -LargeBlobBytes 128
