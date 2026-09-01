@@ -1,6 +1,6 @@
 ---
 name: ftl-skill-authoring
-description: 为 FTLSoulSkill 仓库创建、修改、审查和格式化 Skill，强制从已验证的 Z:\Code\FTLSoulSkill 权威源码工作树编辑并校验 Markdown 排版；目标是 FTLSoul Skill 时即使当前会话位于其他项目也适用，不用于其他项目自己的 Skill。
+description: 为 FTLSoulSkill 仓库创建、修改、审查和格式化 Skill，从当前源码位置或受管安装清单确定并验证权威源码工作树，再执行仓库专用编写与 Markdown 校验；目标是 FTLSoul Skill 时即使当前会话位于其他项目也适用，不用于其他项目自己的 Skill。
 ---
 
 # 编写 FTLSoul Skill
@@ -19,12 +19,10 @@ description: 为 FTLSoulSkill 仓库创建、修改、审查和格式化 Skill�
 
 ## 锁定权威源码
 
-- 本机 FTLSoul 唯一权威源码根目录是 `Z:\Code\FTLSoulSkill`。所有读取、编辑、差异审查、验证和提交路径都以这个规范路径为准，即使当前会话工作目录属于其他项目。
-- 编辑前确认该目录是 Git 工作树根目录，并包含 `AGENTS.md`、`README.md`、`scripts/link-skills.ps1` 和 `skills/`。`git rev-parse --show-toplevel` 的规范化结果必须等于该目录。
-- 若 `C:\Users\Administrator\.agents\skills\.ftl-soul-skill-links.json` 存在，读取其 `sourceRoot` 并确认同样指向 `Z:\Code\FTLSoulSkill`。清单缺失可以作为安装状态报告，但不得改变已经验证的源码根目录；清单指向其他来源则属于冲突，必须停止编辑。
-- `%USERPROFILE%\.agents\skills\ftl-*`、`%USERPROFILE%\.codex\skills\ftl-*`、插件缓存和其他 C 盘发现路径都是安装、链接或缓存表面，不是源码编辑目标。即使某个路径当前是指向 Z 盘的符号链接，命令、差异和交付说明仍使用 Z 盘路径。
-- Z 盘仓库不存在、签名文件不匹配、Git 根目录不符、受管来源冲突或目标只存在于 C 盘独立副本时，停止并报告；不得直接修改、复制或删除 C 盘内容。只有用户明确变更并验证新的 FTLSoul 权威 checkout 后，才能替换本机根目录约定。
-- 用户安装链接只通过仓库的 `scripts/link-skills.ps1` 创建、更新或清理。源码修改不自动授权实际同步用户目录。
+- 开始读取、编辑、差异审查、验证或提交前，运行当前已加载 `ftl-skill-authoring` 目录中的 `scripts/resolve-source-root.ps1`，把它唯一输出的规范化路径作为本次任务的 FTLSoul 权威源码根目录；后续路径都从该根目录拼接，不重新猜测来源。
+- 解析器只接受两类确定来源：脚本自身位于有效 FTLSoul Git 工作树时使用该工作树；脚本从受管全局 Skill 链接调用时使用相邻 `.ftl-soul-skill-links.json` 中经过验证的 `sourceRoot`。解析器会核对 Git 根目录、仓库签名文件和 `ftl-skill-authoring` 目标，来源缺失、无效或冲突时必须停止。
+- 不搜索磁盘，不根据当前会话工作目录随意选择同名仓库，也不把用户安装目录、Codex Skill 目录、插件缓存或独立复制的 Skill 当作可编辑源码。安装路径即使能读取 Skill，也只有解析器返回的 Git 工作树可以承载修改、差异和提交。
+- 找不到有效来源时，提示用户从实际 FTLSoul 克隆目录运行 `scripts/link-skills.ps1`；用户安装链接只通过该脚本创建、更新或清理。源码修改不自动授权同步用户目录。
 
 ## 编写与排版
 
@@ -37,6 +35,6 @@ description: 为 FTLSoulSkill 仓库创建、修改、审查和格式化 Skill�
 ## 验证与提交
 
 - 对新增或修改的 Skill 运行 `skill-creator` 提供的 `quick_validate.py`；Windows 默认编码不能读取 UTF-8 时使用 Python UTF-8 模式重跑，不把环境编码错误报告为 Skill 内容错误。
-- 运行 `Z:\Code\FTLSoulSkill\skills\engineering\ftl-skill-authoring\scripts\validate-skill-markdown.ps1` 检查整个 `Z:\Code\FTLSoulSkill\skills`。修复全部普通段落、列表项和 frontmatter 续行；代码围栏、真正嵌套列表、表格、引用块和明确硬换行不得误报。
+- 从解析后的源码根目录运行 `skills/engineering/ftl-skill-authoring/scripts/validate-skill-markdown.ps1`，检查该根目录下的整个 `skills/`。修复全部普通段落、列表项和 frontmatter 续行；代码围栏、真正嵌套列表、表格、引用块和明确硬换行不得误报。
 - 从仓库根目录运行 `scripts/link-skills.ps1 -WhatIf`，验证 frontmatter、名称唯一性和受管链接集合；没有单独授权时使用隔离的预演目标，不实际同步用户目录。
 - 运行 `git diff --check`，审计精确路径和实际差异，并执行与修改风险相称的内容或行为检查。验证通过后由适用上游流程使用 `ftl-local-commit` 创建隔离的本地提交；不得由源码编辑推导 push、合并、发布或其他外部动作。

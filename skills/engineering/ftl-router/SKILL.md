@@ -27,7 +27,7 @@ description: 作为 FTL 工程工作流的统一入口，区分只读讨论、�
 
 ## FTLSoul Skill 编写
 
-当请求创建、修改、审查或格式化 FTLSoul 仓库中的 Skill 时，完整读取并使用 `Z:\Code\FTLSoulSkill\skills\engineering\ftl-skill-authoring\SKILL.md` 中的 `ftl-skill-authoring`。即使当前会话位于其他项目，也由该 Skill 验证并使用 FTLSoul 权威源码工作树，不把用户安装目录或缓存路径当作编辑目标。
+当请求创建、修改、审查或格式化 FTLSoul 仓库中的 Skill 时，完整读取并使用已发现的 `ftl-skill-authoring`。即使当前会话位于其他项目，也由该 Skill 确定并验证 FTLSoul 权威源码工作树；未发现该 Skill 时报告安装不完整，不扫描磁盘或回退修改用户安装目录、Codex Skill 目录及插件缓存。
 
 `ftl-skill-authoring` 只补充源码位置、编写质量、Markdown 排版和验证，不替代下方的任务分类、授权判断或 Harness 自修改边界。创建或修改 FTLSoul 治理语义时仍按明确实施路线进入需求确认及适用执行器；能够证明不改变权威语义的机械修正才可走小改动路线。
 
